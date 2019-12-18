@@ -102,10 +102,12 @@ class MyDatabase {
             $j++;
         }
         echo $str." | ".$vals." | ".$var."<br>";
+
         /*$stmt = $conn->prepare("INSERT INTO MyGuests (firstname, lastname, email) VALUES (:firstname, :lastname, :email)");
          $stmt->bindParam(':firstname', $firstname); //POZOR: navážu proměnnou!
          $stmt->bindParam(':lastname', $lastname);
          $stmt->bindParam(':email', $email);*/
+
         // slozim dotaz a osetrim proti sql injection
         $q = $this->pdo->prepare("SELECT * FROM ".$tableName." WHERE ($str) VALUES ($vals)".(($orderByStatement == "") ? "" : " ORDER BY $orderByStatement"));
         $query="SELECT * FROM ".$tableName." WHERE ($str) VALUES ($vals)";
