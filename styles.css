@@ -1,0 +1,121 @@
+
+nav {
+    background-color:#EEEE88;
+    padding-bottom: -0.5%;
+    padding-left: 0.5%;
+    border-start-start-radius: 10px;
+    border-start-end-radius: 10px;
+    width: 100%;
+    left: 0px;
+    position: fixed;
+    top: 0px;
+}
+nav a {
+    margin: 0px 10px;
+    border: 1px solid darkorange;
+    padding: 5px 6px;
+    background-color: orange;
+    border-radius:10%;
+    clear:both;
+}
+.nav{
+    display: inline;
+}
+a:hover{
+    background-color: #EEEE88;
+}
+footer {
+    padding: 0.5%;
+    background-color: #EEEE88;
+    text-align: center;
+    border-end-end-radius: 10px;
+    border-end-start-radius: 10px;
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+
+}
+td, th, tr{
+    min-width: 50px;
+    padding: 0px 5px;
+}
+/*.alert {
+    padding: 10px;
+    background-color: lightblue;
+    font-weight: bold;
+    margin-bottom: 20px;
+    border-radius: 10px;
+}*/
+body{
+    padding: 5%;
+}
+hr{
+    border-top: 1px solid #333333;
+}
+textarea{
+    width: 450px;
+    height: 150px;
+}
+input{
+    margin:10px;
+    clear:none;
+}
+/* Mala obrazovka "<=768px" (pravdepodobne mobilni telefon) */
+@media only screen and (max-width: 768px) {
+    /* sloupce SM */
+    .my-col-sm-1 {width: 8.33%;}
+    .my-col-sm-2 {width: 16.66%;}
+    .my-col-sm-3 {width: 25%;}
+    .my-col-sm-4 {width: 33.33%;}
+    .my-col-sm-5 {width: 41.66%;}
+    .my-col-sm-6 {width: 50%;}
+    .my-col-sm-7 {width: 58.33%;}
+    .my-col-sm-8 {width: 66.66%;}
+    .my-col-sm-9 {width: 75%;}
+    .my-col-sm-10 {width: 83.33%;}
+    .my-col-sm-11 {width: 91.66%;}
+    .my-col-sm-12 {width: 100%;}
+    nav a {
+        margin: 0px 2px;
+        padding: 2px 2px;
+        clear:both;
+    }
+    textarea{
+        width: 250px;
+        height: 100px;
+    }
+    h2{
+        font-size:5px;
+    }
+    h1{
+        font-size:5px;
+    }
+    footer{
+        visibility: hidden;
+    }
+    input{
+        clear: both;
+    }
+    .nav{
+        clear: both;
+    }
+}
+
+
+/* Stredni obrazovka ">=768px" (pravdepodobne tablet, nebo malý notebook)*/
+@media only screen and (min-width: 768px) {
+    /* sloupce MD */
+    .my-col-md-1 {width: 8.33%;}
+    .my-col-md-2 {width: 16.66%;}
+    .my-col-md-3 {width: 25%;}
+    .my-col-md-4 {width: 33.33%;}
+    .my-col-md-5 {width: 41.66%;}
+    .my-col-md-6 {width: 50%;}
+    .my-col-md-7 {width: 58.33%;}
+    .my-col-md-8 {width: 66.66%;}
+    .my-col-md-9 {width: 75%;}
+    .my-col-md-10 {width: 83.33%;}
+    .my-col-md-11 {width: 91.66%;}
+    .my-col-md-12 {width: 100%;}
+}
