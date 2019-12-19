@@ -69,7 +69,7 @@ class MyDatabase {
      * @return array                    Vraci pole ziskanych radek tabulky.
      */
 
-    /*public function selectFromTable(string $tableName, string $whereStatement = "", string $orderByStatement = ""):array {
+    public function selectFromTable2(string $tableName, string $whereStatement = "", string $orderByStatement = ""):array {
         // slozim dotaz
         $q = "SELECT * FROM ".$tableName
             .(($whereStatement == "") ? "" : " WHERE $whereStatement")
@@ -82,44 +82,34 @@ class MyDatabase {
             return [];
         }
         return $obj->fetchAll();
-    }*/
+    }
 
     public function selectFromTable(string $tableName, array $whereStatement, string $orderByStatement = ""):array {
         //rozdeleni prichozich hodnot na stringy a promenne
         $i = 0;
-        $j = 0;
         $str = "";
-        $var = "";
-        $vals = ":val1";
-        foreach ($whereStatement[0] as $s){
-            $str.="$s";
-            $i++;
+        if($whereStatement[0][0]=="" && $whereStatement[1][0]==""){
+            $res = $this->selectFromTable2($tableName, "", $orderByStatement);
+            return $res;
         }
-        $j=1;
-        foreach ($whereStatement[1] as $v){
-            $var.="$v";
-            if($j!=1)$vals.=", :val$j";
-            $j++;
+        else{
+        for($i=0;$i<sizeof($whereStatement[0]);$i++){
+            if($i!=0)$str.=" AND ";
+            $str.="".$whereStatement[0][$i]."=:".$whereStatement[0][$i];
+            //var_dump($whereStatement[0][$i]);
         }
-        echo $str." | ".$vals." | ".$var."<br>";
-
-        /*$stmt = $conn->prepare("INSERT INTO MyGuests (firstname, lastname, email) VALUES (:firstname, :lastname, :email)");
-         $stmt->bindParam(':firstname', $firstname); //POZOR: navážu proměnnou!
-         $stmt->bindParam(':lastname', $lastname);
-         $stmt->bindParam(':email', $email);*/
-
+        $str.=";";
+        //echo $str."<br>";
         // slozim dotaz a osetrim proti sql injection
-        $q = $this->pdo->prepare("SELECT * FROM ".$tableName." WHERE ($str) VALUES ($vals)".(($orderByStatement == "") ? "" : " ORDER BY $orderByStatement"));
-        $query="SELECT * FROM ".$tableName." WHERE ($str) VALUES ($vals)";
-        echo $query;
-        for($k = 1; $k<$j; $k++){
-            $x = $whereStatement[1][$k-1];
-            echo "<br>bindParam(\":val$k\",$x)";
-            $q->bindParam(":val$k",$x);
+
+            $q = $this->pdo->prepare("SELECT * FROM ".$tableName." WHERE $str".(($orderByStatement == "") ? "" : " ORDER BY $orderByStatement"));
+
+        for($i=0;$i<sizeof($whereStatement[0]);$i++){
+            $q->bindParam(':'.$whereStatement[0][$i], $whereStatement[1][$i]);
         }
         $q->execute();
         $obj = $q->fetchAll();
-        return $obj;
+        return $obj;}
     }
 
     /**
@@ -192,7 +182,9 @@ class MyDatabase {
      */
     public function getAllUsers(){
         // ziskam vsechny uzivatele z DB razene dle ID a vratim je
-        $users = $this->selectFromTable(TABLE_UZIVATEL, "", "id_uzivatel");
+        $where[0][0]="";
+        $where[1][0]="";
+        $users = $this->selectFromTable(TABLE_UZIVATEL, $where, "id_uzivatel");
         return $users;
     }
 
@@ -202,8 +194,10 @@ class MyDatabase {
      * @return array    Pole se vsemi pravy.
      */
     public function getAllRights(){
+        $where[0][0]="";
+        $where[1][0]="";
         // ziskam vsechny uzivatele z DB razene dle ID a vratim je
-        $users = $this->selectFromTable(TABLE_PRAVO, "", "id_pravo ASC, nazev ASC");
+        $users = $this->selectFromTable(TABLE_PRAVO, $where, "id_pravo ASC, nazev ASC");
         return $users;
     }
 
@@ -235,9 +229,9 @@ class MyDatabase {
      * @param int $idPravo      ID prava.
      * @return bool             Bylo upraveno?
      */
-    public function updateUser(int $idUzivatel, string $login, string $heslo, string $jmeno, int $idPravo){
+    public function updateUserRights(int $idUzivatel, int $idPravo){
         // slozim cast s hodnotami
-        $updateStatementWithValues = "login='$login', heslo='$heslo', jmeno='$jmeno', id_pravo='$idPravo'";
+        $updateStatementWithValues = "id_pravo='$idPravo'";
         // podminka
         $whereStatement = "id_uzivatel=$idUzivatel";
         // provedu update
@@ -258,14 +252,14 @@ class MyDatabase {
     public function userLogin(string $login, string $heslo){
         // ziskam uzivatele z DB - primo overuju login i heslo
         //$where = "login='$login' AND heslo='$heslo'";
-        $strings[0]="login";
-        $strings[1]=", heslo";
-        $var[0]=$login;
-        $var[1]=$heslo;
-        $where[0]=$strings;
-        $where[1]=$var;
+        $strings[0][0]="login";
+        $strings[0][1]="heslo";
+        $strings[1][0]=$login;
+        $strings[1][1]=$heslo;
+        $where=$strings;
+
         $user = $this->selectFromTable(TABLE_UZIVATEL, $where);
-        var_dump($user);
+        //var_dump($user);
         // ziskal jsem uzivatele
         if(count($user)){
             // ziskal - ulozim ho do session
@@ -312,10 +306,10 @@ class MyDatabase {
                 return null;
             } else {
                 // nactu data uzivatele z databaze
-                $string[0]="id_user";
-                $var[0]="$userId";
-                $where[0]=$string;
-                $where[1]=$var;
+                $string[0][0]="id_uzivatel";
+                $string[1][0]="$userId";
+                $where=$string;
+                //echo "<br>user id: ".$userId;
                 $userData = $this->selectFromTable(TABLE_UZIVATEL, $where);
                 // mam data uzivatele?
                 if(empty($userData)){
@@ -356,12 +350,11 @@ class MyDatabase {
     }
 //najdi a vrat uzivatele podle id
     public function findUser(int $id_uzivatel){
-        $string[0]="id_user";
-        $var[0]="$id_uzivatel";
-        $where[0]=$string;
-        $where[1]=$var;
+        $string[0][0]="id_uzivatel";
+        $string[1][0]="$id_uzivatel";
+        $where=$string;
         $userData = $this->selectFromTable(TABLE_UZIVATEL, $where);
-        return $userData[0];
+        return $userData;
     }
 //smaz uzivatele podle id
     public function deleteUser(int $id_uzivatel){
@@ -370,10 +363,9 @@ class MyDatabase {
     }
 //najdi vsechny prispevky, ktere mam hodnotit
     public function getAllPostsForMe(int $id_uzivatel){
-        $string[0]="id_user";
-        $var[0]="$id_uzivatel";
-        $where[0]=$string;
-        $where[1]=$var;
+        $string[0][0]="id_uzivatel";
+        $string[1][0]="$id_uzivatel";
+        $where=$string;
         $rates = $this->selectFromTable(TABLE_RATING, $where);
         return $rates;
     }
@@ -391,27 +383,26 @@ class MyDatabase {
     }
 //podle uzivatele a id prispevku, tento prispevek odstran
     public function removeRating(int $id_uzivatel, int $id_post){
-        if($this->deleteFromTable(TABLE_RATING, "id_uzivatel=$id_uzivatel && id_post=$id_post"))return 1;
+        if($this->deleteFromTable(TABLE_RATING, "id_uzivatel=$id_uzivatel AND id_post=$id_post"))return 1;
         else return 0;
     }
 //zkontroluj jestli uz muze byt prispevek zverejnen
     public function checkVis(int $id_post){
         $counter = 0;
-        $string[0]="rating";
-        $string[1]=", id_post";
-        $var[0]=-1;
-        $var[1]=$id_post;
-        $where[0]=$string;
-        $where[1]=$var;
-        foreach ($this->selectFromTable(TABLE_RATING, $where) as $p){
+        /*$string[0][0]="rating";
+        $string[0][1]="id_post";
+        $string[1][0]=-1;
+        $string[1][0]=$id_post;
+        $where=$string;*/
+        $where="rating!=-1 && id_post=$id_post";
+        foreach ($this->selectFromTable2(TABLE_RATING, $where) as $p){
             $counter=$counter+1;
             if($counter>2){
-                $string[0]="vis";
-                $string[1]=", id_post";
-                $var[0]=0;
-                $var[1]=$id_post;
-                $where[0]=$string;
-                $where[1]=$var;
+                $string[0][0]="vis";
+                $string[0][1]="id_post";
+                $string[1][0]=0;
+                $string[1][1]=$id_post;
+                $where=$string;
                 $post = $this->selectFromTable(TABLE_POSTS, $where);
                 $updateStatementWithValues = "pending=1";
                 $whereStatement = "id_post=$id_post";
@@ -423,10 +414,9 @@ class MyDatabase {
     public function checkRating($id_post){
         $counter = 0;
         $val = 0;
-        $string[0]="id_post";
-        $var[0]=$id_post;
-        $where[0]=$string;
-        $where[1]=$var;
+        $string[0][0]="id_post";
+        $string[1][0]=$id_post;
+        $where=$string;
         $array = $this->selectFromTable(TABLE_RATING, $where);
         foreach ($array as $r){
             if($r['rating']>0){
@@ -437,10 +427,8 @@ class MyDatabase {
         $val/=$counter;
         $update = "rating=$val";
 
-        $string[0]="id_post";
-        $var[0]=$id_post;
-        $where[0]=$string;
-        $where[1]=$var;
+
+        $where="id_post=$id_post";
         $this->updateInTable(TABLE_POSTS,$update,$where);
     }
 //odstran prispevek podle id

@@ -55,6 +55,23 @@ else {
     }
     //vypis clanku k ohodnoceni (nejdrive zatim nehodnocene clanky)
     $res = "";
+    //pro admina vypis clanky, ktere jsou ohodnocene a cekaji uz jen na zverejneni
+    if (array_key_exists('stories', $tplData) && $myDB->getLoggedUserData()[4]>=3) {
+        foreach ($tplData['stories'] as $d) {
+            if ($d['vis'] == 0 && $d['pending'] == 1) {
+                $res .= "<h2>$d[title]</h2>";
+                $res .= "<b>Autor:</b> $d[author]<br><br>";
+                $res .= "<div style='text-align:justify;'> $d[text]</div>";
+                $res .= "Hodnocení: $d[rating]<br><form action='' method='post'>";
+                $res .= "<input type='hidden' name='del' value='$d[0]'>";
+                $res .= "<input type='submit' name='delete' value='Smazat'  class='btn btn-warning mb-2'>";
+                $res .= "<input type='hidden' name='rev' value='$d[0]'>";
+                $res .= "<input type='submit' name='reveal' value='Zveřejnit'  class='btn btn-warning mb-2'></form><hr>";
+            }
+        }
+    } else {
+        //nic nevypisuj
+    }
     if (array_key_exists('stories', $tplData)) {
         $posts = $myDB->getAllPostsForMe($myDB->getLoggedUserData()[0]);
 
@@ -75,7 +92,7 @@ else {
                         $res .= "<input type='hidden' name='recenze' value='$d[0]'>";
                         //$res .= "<input type='hidden' name='recenze2' value='$post[3]'>";
                         $hodnoceno=$post[3];
-                        $res .= "<input type='submit' name='rate' value='Ohodnoť'></form><hr>";
+                        $res .= "<input class='btn btn-warning mb-2' type='submit' name='rate' value='Ohodnoť'></form><hr>";
                     }
                 }
             }
@@ -106,23 +123,7 @@ else {
     } else {
         //nic nevypisuj
     }
-    //pro admina vypis clanky, ktere jsou ohodnocene a cekaji uz jen na zverejneni
-    if (array_key_exists('stories', $tplData) && $myDB->getLoggedUserData()[4]>=3) {
-        foreach ($tplData['stories'] as $d) {
-            if ($d['vis'] == 0 && $d['pending'] == 1) {
-                $res .= "<h2>$d[title]</h2>";
-                $res .= "<b>Autor:</b> $d[author]<br><br>";
-                $res .= "<div style='text-align:justify;'> $d[text]</div>";
-                $res .= "Hodnocení: $d[rating]<br><form action='' method='post'>";
-                $res .= "<input type='hidden' name='del' value='$d[0]'>";
-                $res .= "<input type='submit' name='delete' value='Smazat'  class='btn btn-warning mb-2'>";
-                $res .= "<input type='hidden' name='rev' value='$d[0]'>";
-                $res .= "<input type='submit' name='reveal' value='Zveřejnit'  class='btn btn-warning mb-2'></form><hr>";
-            }
-        }
-    } else {
-        //nic nevypisuj
-    }
+
 
     echo $res;
 }

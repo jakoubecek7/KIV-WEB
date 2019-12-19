@@ -59,7 +59,9 @@ if(!$myDB->isUserLogged()){
 //uzivatel je prihlaseny
 else {
     // ziskam nazev prava uzivatele, abych ho mohl vypsat
-    $pravo = $myDB->selectFromTable(TABLE_PRAVO, "id_pravo=$user[id_pravo]");
+    $where[0][0]="id_pravo";
+    $where[1][0]=$user['id_pravo'];
+    $pravo = $myDB->selectFromTable(TABLE_PRAVO, $where);
     // ziskal jsem dane pravo
     if(empty($pravo)){
         // neziskal - pouziju jen Nezname

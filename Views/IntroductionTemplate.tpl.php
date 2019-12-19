@@ -59,7 +59,7 @@ if(array_key_exists('stories', $tplData)) {
 
 //vypis ostatnich clanku
     foreach ($tplData['stories'] as $d) {
-        if($d['vis']==1 || $myDB->getLoggedUserData()[4]==3 || ($d['vis']==0 && $d['id_aut']==$myDB->getLoggedUserData()[0])) {
+        if($d['vis']==1 || $myDB->getLoggedUserData()[4]==3 && $d['vis']==0 || ($d['vis']==0 && $d['id_aut']==$myDB->getLoggedUserData()[0])) {
             $res .= "<h2>$d[title]</h2>";
             $res .= "<b>Autor:</b> $d[author] ($d[rating])<br><br>";
             $res .= "<div style='text-align:justify;'> $d[text]</div>";

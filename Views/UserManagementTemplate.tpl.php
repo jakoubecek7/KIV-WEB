@@ -23,20 +23,19 @@ if($myDB->getLoggedUserData()[4]!=3)
 else {
 // nemuzu smazat sebe, jinak smaz vybraneho uzivatele
     if (isset($tplData['delete']) && $myDB->getLoggedUserData()[0]!=htmlspecialchars($_POST['id_user'], ENT_QUOTES, 'UTF-8')) {
-        if($myDB->deleteUser(htmlspecialchars($_POST['id_user'], ENT_QUOTES, 'UTF-8'))==1)echo "Uživatel byl smazán.";
-        else echo "Smazání se nepodařilo";
+        if($myDB->deleteUser(htmlspecialchars($_POST['id_user'], ENT_QUOTES, 'UTF-8'))==1)//echo "Uživatel byl smazán.";
+        //else echo "Smazání se nepodařilo";
         header("Refresh:0");
 
     }
 // zmena prav uzivatele - nelze odebrat sva prava
     if (isset($_POST['change']) && $myDB->getLoggedUserData()[0]!=htmlspecialchars($_POST['id_user'], ENT_QUOTES, 'UTF-8')){
         $myUser = $myDB ->findUser(htmlspecialchars($_POST['id_user'], ENT_QUOTES, 'UTF-8'));
-        $id = $myUser[0];
-        $jmeno = $myUser[1];
-        $login = $myUser[2];
-        $heslo = $myUser[3];
+        $id = $myUser[0][0];
+        //var_dump($id);
+        //echo $id;
         $pravo = htmlspecialchars($_POST['pravo'], ENT_QUOTES, 'UTF-8');
-        $myDB->updateUser($id, $login, $heslo, $jmeno, $pravo);
+        $myDB->updateUserRights($id, $pravo);
         header("Refresh:0");
     }
 
